@@ -13,6 +13,7 @@ enum class EAttackType : uint8
     LightAttackB    UMETA(DisplayName = "LightAttackB"),
     HeavyAttackA    UMETA(DisplayName = "HeavyAttackA"),
     HeavyAttackB    UMETA(DisplayName = "HeavyAttackB"),
+    None            UMETA(DisplayName = "None"),
 };
 
 UENUM(BlueprintType)
