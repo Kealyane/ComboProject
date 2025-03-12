@@ -7,6 +7,7 @@
 #include "Datas/MyEnums.h"
 #include "ComboComponent.generated.h"
 
+class AComboProjectCharacter;
 class UComboNodeAsset;
 
 USTRUCT(BlueprintType)
@@ -41,6 +42,10 @@ class COMBOPROJECT_API UComboComponent : public UActorComponent
 public:	
 	UComboComponent();
 
+	bool IsComboActive() const { return bIsComboActive; }
+	bool IsInputWindowOpen() const { return bInputWindowOpen; }
+	bool IsBeforeInputWindow() const { return bIsBeforeInputWindow; }
+
 protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Combos")
@@ -48,11 +53,20 @@ protected:
 	
 	virtual void BeginPlay() override;
 
+	TSharedPtr<FComboNode> ComboGraph;
 	UFUNCTION()
 	void InitGraph();
 
-	
-	TSharedPtr<FComboNode> ComboGraph;
+	bool bIsComboActive;
+	bool bInputWindowOpen;
+	bool bIsBeforeInputWindow;
+
+	void StartCombo(EInputType InputName);
+	void NextCombo(EInputType InputName);
+	void EndCombo();
+
+	UFUNCTION()
+	void OnInputReceived(EInputType InputReceived);
 
 public:	
 	// Called every frame
@@ -60,6 +74,10 @@ public:
 
 
 private:
+	TObjectPtr<USkeletalMeshComponent> SkeletalMesh;
+	TObjectPtr<AComboProjectCharacter> ComboCharacter;
+	TSharedPtr<FComboNode> CurrentComboNode;
+	
 	void InitComboNodes(const TSharedPtr<FComboNode> *CurrentNode, const UComboNodeAsset* CurrentComboAsset);
 	void DebugGraph(const TSharedPtr<FComboNode>& Node, const FString& Indent);
 };

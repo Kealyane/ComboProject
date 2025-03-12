@@ -2,22 +2,62 @@
 
 
 #include "Character/ComboComponent.h"
-
+#include "ComboProject/ComboProjectCharacter.h"
 #include "Datas/ComboNodeAsset.h"
 
 UComboComponent::UComboComponent()
 {
 	PrimaryComponentTick.bCanEverTick = true;
+	bIsComboActive = false;
+	bInputWindowOpen = false;
+	bIsBeforeInputWindow = false;
 }
-
-
 
 void UComboComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
+	ComboCharacter = Cast<AComboProjectCharacter>(GetOwner());
+	SkeletalMesh = ComboCharacter->GetMesh();
 	InitGraph();
+
+	ComboCharacter->InputFired.BindUFunction(this, FName("OnInputReceived"));
+	// Debug
 	DebugGraph(ComboGraph, TEXT(""));
+}
+
+void UComboComponent::StartCombo(EInputType InputName)
+{
+	bIsComboActive = true;
+	bInputWindowOpen = false;
+	bIsBeforeInputWindow = true;
+
+	CurrentComboNode = (*ComboGraph).Nodes[InputName];
+	if (SkeletalMesh)
+	{
+		SkeletalMesh->PlayAnimation(CurrentComboNode->Animation, false);
+	}
+}
+
+void UComboComponent::NextCombo(EInputType InputName)
+{
+	CurrentComboNode = (*CurrentComboNode).Nodes[InputName];
+	if (SkeletalMesh)
+	{
+		SkeletalMesh->PlayAnimation(CurrentComboNode->Animation, false);
+	}
+}
+
+void UComboComponent::EndCombo()
+{
+	bIsComboActive = false;
+	bInputWindowOpen = false;
+	bIsBeforeInputWindow = false;
+}
+
+void UComboComponent::OnInputReceived(EInputType InputReceived)
+{
+	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Cyan, TEXT("Input Received"));
 }
 
 void UComboComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
