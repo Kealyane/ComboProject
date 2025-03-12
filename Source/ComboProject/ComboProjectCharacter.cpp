@@ -77,15 +77,19 @@ void AComboProjectCharacter::SetupPlayerInputComponent(UInputComponent* PlayerIn
 	// Set up action bindings
 	if (UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(PlayerInputComponent)) {
 		
-		// Jumping
-		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Started, this, &ACharacter::Jump);
-		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Completed, this, &ACharacter::StopJumping);
+		// // Jumping
+		// EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Started, this, &ACharacter::Jump);
+		// EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Completed, this, &ACharacter::StopJumping);
 
 		// Moving
 		EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &AComboProjectCharacter::Move);
 
 		// Looking
 		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &AComboProjectCharacter::Look);
+
+		// Attack
+		EnhancedInputComponent->BindAction(AttackLightAction, ETriggerEvent::Started, this, &AComboProjectCharacter::AttackLight);
+		EnhancedInputComponent->BindAction(AttackHeavyAction, ETriggerEvent::Started, this, &AComboProjectCharacter::AttackHeavy);
 	}
 	else
 	{
@@ -95,24 +99,27 @@ void AComboProjectCharacter::SetupPlayerInputComponent(UInputComponent* PlayerIn
 
 void AComboProjectCharacter::Move(const FInputActionValue& Value)
 {
-	// input is a Vector2D
-	FVector2D MovementVector = Value.Get<FVector2D>();
-
-	if (Controller != nullptr)
+	if (!bLockMouvement)
 	{
-		// find out which way is forward
-		const FRotator Rotation = Controller->GetControlRotation();
-		const FRotator YawRotation(0, Rotation.Yaw, 0);
+		// input is a Vector2D
+		FVector2D MovementVector = Value.Get<FVector2D>();
 
-		// get forward vector
-		const FVector ForwardDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
-	
-		// get right vector 
-		const FVector RightDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
+		if (Controller != nullptr)
+		{
+			// find out which way is forward
+			const FRotator Rotation = Controller->GetControlRotation();
+			const FRotator YawRotation(0, Rotation.Yaw, 0);
 
-		// add movement 
-		AddMovementInput(ForwardDirection, MovementVector.Y);
-		AddMovementInput(RightDirection, MovementVector.X);
+			// get forward vector
+			const FVector ForwardDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
+		
+			// get right vector 
+			const FVector RightDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
+
+			// add movement 
+			AddMovementInput(ForwardDirection, MovementVector.Y);
+			AddMovementInput(RightDirection, MovementVector.X);
+		}
 	}
 }
 
@@ -126,5 +133,27 @@ void AComboProjectCharacter::Look(const FInputActionValue& Value)
 		// add yaw and pitch input to controller
 		AddControllerYawInput(LookAxisVector.X);
 		AddControllerPitchInput(LookAxisVector.Y);
+	}
+}
+
+void AComboProjectCharacter::AttackLight(const FInputActionValue& Value)
+{
+	bool InputValue = Value.Get<bool>();
+	
+	if (InputValue)
+	{
+		InputFired.ExecuteIfBound(EInputType::MouseLeft);
+		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Light Attack"));
+	}
+}
+
+void AComboProjectCharacter::AttackHeavy(const FInputActionValue& Value)
+{
+	bool InputValue = Value.Get<bool>();
+	
+	if (InputValue)
+	{
+		InputFired.ExecuteIfBound(EInputType::MouseRight);
+		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Heavy Attack"));
 	}
 }
