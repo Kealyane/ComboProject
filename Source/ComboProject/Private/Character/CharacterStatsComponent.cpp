@@ -65,6 +65,11 @@ void UCharacterStatsComponent::RegenerateStamina()
 	CurrentStamina += 1.f;
 }
 
+bool UCharacterStatsComponent::HasStamina(float Value)
+{
+	return CurrentStamina - Value >= 0.f;
+}
+
 
 // // Called every frame
 // void UCharacterStatsComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)

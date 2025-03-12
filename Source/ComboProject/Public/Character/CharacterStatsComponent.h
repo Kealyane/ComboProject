@@ -19,7 +19,7 @@ public:
 
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Stats", meta=(AllowPrivateAccess=true))
-	TSoftObjectPtr<UCharacterStatsAsset> CharacterStatsAsset;
+	TObjectPtr<UCharacterStatsAsset> CharacterStatsAsset;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Stats|Health", meta=(AllowPrivateAccess=true))
 	float MaxHP;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Stats|Health", meta=(AllowPrivateAccess=true))
@@ -51,6 +51,8 @@ public:
 	void ChangeStamina(float Value);
 	UFUNCTION()
 	void RegenerateStamina();
+	UFUNCTION()
+	bool HasStamina(float Value);
 
 private:
 	FTimerHandle StaminaTimerHandle;
