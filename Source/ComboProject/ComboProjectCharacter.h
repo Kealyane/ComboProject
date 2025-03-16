@@ -8,6 +8,8 @@
 #include "Logging/LogMacros.h"
 #include "ComboProjectCharacter.generated.h"
 
+class UCharacterStatsComponent;
+class UComboComponent;
 class USpringArmComponent;
 class UCameraComponent;
 class UInputMappingContext;
@@ -29,6 +31,12 @@ class AComboProjectCharacter : public ACharacter
 	/** Follow camera */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	UCameraComponent* FollowCamera;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<UComboComponent> ComboComponent;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<UCharacterStatsComponent> StatsComponent;
 	
 	/** MappingContext */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
@@ -56,6 +64,9 @@ public:
 	AComboProjectCharacter();
 	
 	FInputFiredSignature InputFired;
+
+	UFUNCTION(BlueprintCallable)
+	UCharacterStatsComponent* GetStatsComponent() const {return StatsComponent;}
 	
 protected:
 

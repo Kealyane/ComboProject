@@ -10,6 +10,8 @@
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "InputActionValue.h"
+#include "Character/CharacterStatsComponent.h"
+#include "Character/ComboComponent.h"
 
 DEFINE_LOG_CATEGORY(LogTemplateCharacter);
 
@@ -52,6 +54,9 @@ AComboProjectCharacter::AComboProjectCharacter()
 
 	// Note: The skeletal mesh and anim blueprint references on the Mesh component (inherited from Character) 
 	// are set in the derived blueprint asset named ThirdPersonCharacter (to avoid direct content references in C++)
+
+	ComboComponent = CreateDefaultSubobject<UComboComponent>(TEXT("ComboComponent"));
+	StatsComponent = CreateDefaultSubobject<UCharacterStatsComponent>(TEXT("CharacterStatsComponent"));
 }
 
 void AComboProjectCharacter::BeginPlay()
@@ -99,7 +104,7 @@ void AComboProjectCharacter::SetupPlayerInputComponent(UInputComponent* PlayerIn
 
 void AComboProjectCharacter::Move(const FInputActionValue& Value)
 {
-	if (!bLockMouvement)
+	if (!ComboComponent->IsComboActive())
 	{
 		// input is a Vector2D
 		FVector2D MovementVector = Value.Get<FVector2D>();
@@ -121,6 +126,10 @@ void AComboProjectCharacter::Move(const FInputActionValue& Value)
 			AddMovementInput(RightDirection, MovementVector.X);
 		}
 	}
+	// else
+	// {
+	// 	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Cyan, TEXT("character : can't move"));
+	// }
 }
 
 void AComboProjectCharacter::Look(const FInputActionValue& Value)
@@ -140,7 +149,7 @@ void AComboProjectCharacter::AttackLight(const FInputActionValue& Value)
 {
 	bool InputValue = Value.Get<bool>();
 	
-	if (InputValue)
+	if (InputValue && (!ComboComponent->IsComboActive() || ComboComponent->IsInputWindowOpen()))
 	{
 		InputFired.ExecuteIfBound(EInputType::MouseLeft);
 		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Light Attack"));
@@ -151,7 +160,7 @@ void AComboProjectCharacter::AttackHeavy(const FInputActionValue& Value)
 {
 	bool InputValue = Value.Get<bool>();
 	
-	if (InputValue)
+	if (InputValue && (!ComboComponent->IsComboActive() || ComboComponent->IsInputWindowOpen()))
 	{
 		InputFired.ExecuteIfBound(EInputType::MouseRight);
 		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Heavy Attack"));
