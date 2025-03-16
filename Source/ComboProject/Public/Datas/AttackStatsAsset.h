@@ -10,7 +10,7 @@
 /**
  * 
  */
-UCLASS()
+UCLASS(BlueprintType)
 class COMBOPROJECT_API UAttackStatsAsset : public UDataAsset
 {
 	GENERATED_BODY()
@@ -24,4 +24,6 @@ public:
 	float Damage;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Stats)
 	float StaminaCost;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Stats)
+	TObjectPtr<UAnimMontage> AnimationMontage;
 };

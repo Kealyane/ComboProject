@@ -10,7 +10,7 @@
 /**
  * 
  */
-UCLASS()
+UCLASS(BlueprintType)
 class COMBOPROJECT_API UComboGraphAsset : public UDataAsset
 {
 	GENERATED_BODY()
