@@ -3,9 +3,18 @@
 
 #include "Animation/AnimNotify_ApplyEffect.h"
 
+#include "Animation/ComboAnimInstance.h"
+
 void UAnimNotify_ApplyEffect::Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation,
-	const FAnimNotifyEventReference& EventReference)
+                                     const FAnimNotifyEventReference& EventReference)
 {
 	Super::Notify(MeshComp, Animation, EventReference);
-	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Notify ApplyEffect"));
+	
+	//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Notify ApplyEffect"));
+	
+	UComboAnimInstance* AnimInstance = Cast<UComboAnimInstance>(MeshComp->GetAnimInstance());
+	if (AnimInstance)
+	{
+		AnimInstance->AnimApplyEffect.Broadcast();
+	}
 }
