@@ -2,15 +2,19 @@
 
 
 #include "Character/ComboComponent.h"
+
+#include "Animation/ComboAnimInstance.h"
+#include "Character/CharacterStatsComponent.h"
 #include "ComboProject/ComboProjectCharacter.h"
 #include "Datas/ComboNodeAsset.h"
 
 UComboComponent::UComboComponent()
 {
-	PrimaryComponentTick.bCanEverTick = true;
+	PrimaryComponentTick.bCanEverTick = false;
 	bIsComboActive = false;
 	bInputWindowOpen = false;
-	bIsBeforeInputWindow = false;
+	bHasReceivedInput = false;
+	CurrentComboNode = nullptr;
 }
 
 void UComboComponent::BeginPlay()
@@ -18,10 +22,21 @@ void UComboComponent::BeginPlay()
 	Super::BeginPlay();
 
 	ComboCharacter = Cast<AComboProjectCharacter>(GetOwner());
+	check(ComboCharacter);
+	
 	SkeletalMesh = ComboCharacter->GetMesh();
+	check(SkeletalMesh);
+	
+	AnimInstance = Cast<UComboAnimInstance>(SkeletalMesh->GetAnimInstance());
+	check(AnimInstance);
+
+	AnimInstance->AnimInputWindow.AddDynamic(this, &UComboComponent::OnInputWindowOpen);
+	AnimInstance->AnimApplyEffect.AddDynamic(this, &UComboComponent::OnApplyEffect);
+	
 	InitGraph();
 
 	ComboCharacter->InputFired.BindUFunction(this, FName("OnInputReceived"));
+
 	// Debug
 	DebugGraph(ComboGraph, TEXT(""));
 }
@@ -30,46 +45,100 @@ void UComboComponent::StartCombo(EInputType InputName)
 {
 	bIsComboActive = true;
 	bInputWindowOpen = false;
-	bIsBeforeInputWindow = true;
+	bHasReceivedInput = false;
 
-	CurrentComboNode = (*ComboGraph).Nodes[InputName];
-	if (SkeletalMesh)
+	if ((*ComboGraph).Nodes.Contains(InputName))
 	{
-		SkeletalMesh->PlayAnimation(CurrentComboNode->Animation, false);
+		CurrentComboNode = (*ComboGraph).Nodes[InputName];
+		AnimInstance->Montage_Play(CurrentComboNode->AnimationMontage);
 	}
 }
 
 void UComboComponent::NextCombo(EInputType InputName)
 {
-	CurrentComboNode = (*CurrentComboNode).Nodes[InputName];
-	if (SkeletalMesh)
+	if (bInputWindowOpen &&
+		(*CurrentComboNode).Nodes.Contains(InputName))
 	{
-		SkeletalMesh->PlayAnimation(CurrentComboNode->Animation, false);
+		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Cyan, TEXT("Next combo: update current"));
+		CurrentComboNode = (*CurrentComboNode).Nodes[InputName];
+		
+		if (ComboCharacter->GetStatsComponent()->HasStamina(CurrentComboNode->StaminaCost))
+			bHasReceivedInput = true;
+		else
+			EndCombo();
+	}
+	else
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Cyan, TEXT("Next combo : wrong input"));
+		bIsComboActive = false;
+		CurrentComboNode = nullptr;
+		bHasReceivedInput = false;
 	}
 }
 
 void UComboComponent::EndCombo()
 {
+	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Cyan, TEXT("End Combo"));
 	bIsComboActive = false;
 	bInputWindowOpen = false;
-	bIsBeforeInputWindow = false;
+	bHasReceivedInput = false;
 }
 
 void UComboComponent::OnInputReceived(EInputType InputReceived)
 {
-	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Cyan, TEXT("Input Received"));
+	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Cyan,
+		*FString::Printf(TEXT("Input Received %s"), *EnumDebugHelper::InputToString(InputReceived)));
+	if (!bIsComboActive)
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Cyan, TEXT("Input Received: combo not active"));
+		//if (!AnimInstance->Montage_IsPlaying(nullptr))
+		//{
+			GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Cyan, TEXT("Input Received  : start combo"));
+			StartCombo(InputReceived);
+		//}
+	}
+	else
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Cyan, TEXT("Input Received: combo active"));
+		NextCombo(InputReceived);
+	}
 }
 
-void UComboComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
+void UComboComponent::OnInputWindowOpen(bool bIsOpen)
 {
-	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
+	if (bIsOpen)
+	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Cyan, TEXT("OnInputWindowOpen : open"));
+	else GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Cyan, TEXT("OnInputWindowOpen : close"));
+	bInputWindowOpen = bIsOpen;
 
+	if (!bInputWindowOpen)
+	{
+		if (!bHasReceivedInput)
+		{
+			EndCombo();
+		}
+		else
+		{
+			GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Cyan, TEXT("OnInputWindowOpen : close play next anim"));
+			AnimInstance->Montage_Play(CurrentComboNode->AnimationMontage);
+			bHasReceivedInput = false;
+		}
+	}
+}
+
+void UComboComponent::OnApplyEffect()
+{
+	if (CurrentComboNode)
+	{
+		ComboCharacter->GetStatsComponent()->ChangeStamina(-CurrentComboNode->StaminaCost);
+	}
 }
 
 void UComboComponent::InitGraph()
 {
 	if (ComboEntryAsset == nullptr)
 	{
+		UE_LOG(LogTemp, Error, TEXT("UComboComponent::InitGraph: ComboEntryAsset null"));
 		return;
 	}
 
@@ -80,7 +149,8 @@ void UComboComponent::InitGraph()
 			ComboAsset->AttackStatsAsset->AttackName,
 			ComboAsset->AttackStatsAsset->Damage,
 			ComboAsset->AttackStatsAsset->StaminaCost,
-			ComboAsset->AttackStatsAsset->Animation);
+			ComboAsset->AttackStatsAsset->Animation,
+			ComboAsset->AttackStatsAsset->AnimationMontage);
 		
 		ComboGraph->Nodes.Add(ComboAsset->InputName, NewNode);
 
@@ -101,7 +171,8 @@ void UComboComponent::InitComboNodes(const TSharedPtr<FComboNode> *CurrentNode, 
 			ComboAsset->AttackStatsAsset->AttackName,
 			ComboAsset->AttackStatsAsset->Damage,
 			ComboAsset->AttackStatsAsset->StaminaCost,
-			ComboAsset->AttackStatsAsset->Animation);
+			ComboAsset->AttackStatsAsset->Animation,
+			ComboAsset->AttackStatsAsset->AnimationMontage);
 		
 		(*CurrentNode)->Nodes.Add(ComboAsset->InputName, NewNode);
 

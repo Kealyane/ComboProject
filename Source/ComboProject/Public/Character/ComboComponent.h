@@ -7,6 +7,7 @@
 #include "Datas/MyEnums.h"
 #include "ComboComponent.generated.h"
 
+class UComboAnimInstance;
 class AComboProjectCharacter;
 class UComboNodeAsset;
 
@@ -23,13 +24,15 @@ struct FComboNode
 	float StaminaCost;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	TObjectPtr<UAnimSequence> Animation;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	TObjectPtr<UAnimMontage> AnimationMontage;
 
 	TMap<EInputType, TSharedPtr<FComboNode>> Nodes;
 	
-	FComboNode(): AttackName(EAttackType::None), Damage(0.f), StaminaCost(0.f), Animation(nullptr) {}
+	FComboNode(): AttackName(EAttackType::None), Damage(0.f), StaminaCost(0.f), Animation(nullptr), AnimationMontage(nullptr) {}
 
-	FComboNode(EAttackType InAttack, float InDamage, float InStaminaCost, UAnimSequence* InAnimation) :
-	AttackName(InAttack), Damage(InDamage), StaminaCost(InStaminaCost), Animation(InAnimation) {}
+	FComboNode(EAttackType InAttack, float InDamage, float InStaminaCost, UAnimSequence* InAnimation, UAnimMontage* InAnimationMontage) :
+	AttackName(InAttack), Damage(InDamage), StaminaCost(InStaminaCost), Animation(InAnimation), AnimationMontage(InAnimationMontage) {}
 
 	bool IsLastCombo() const { return Nodes.IsEmpty(); }
 };
@@ -44,12 +47,13 @@ public:
 
 	bool IsComboActive() const { return bIsComboActive; }
 	bool IsInputWindowOpen() const { return bInputWindowOpen; }
-	bool IsBeforeInputWindow() const { return bIsBeforeInputWindow; }
+	bool HasReceivedInput() const { return bHasReceivedInput; }
 
 protected:
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Combos")
-	TObjectPtr<UComboNodeAsset> ComboEntryAsset;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Combos", meta=(AllowPrivateAccess="true"))
+	//TObjectPtr<UComboNodeAsset> ComboEntryAsset;
+	UComboNodeAsset* ComboEntryAsset;
 	
 	virtual void BeginPlay() override;
 
@@ -59,7 +63,7 @@ protected:
 
 	bool bIsComboActive;
 	bool bInputWindowOpen;
-	bool bIsBeforeInputWindow;
+	bool bHasReceivedInput;
 
 	void StartCombo(EInputType InputName);
 	void NextCombo(EInputType InputName);
@@ -67,14 +71,14 @@ protected:
 
 	UFUNCTION()
 	void OnInputReceived(EInputType InputReceived);
-
-public:	
-	// Called every frame
-	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
-
+	UFUNCTION()
+	void OnInputWindowOpen(bool bIsOpen);
+	UFUNCTION()
+	void OnApplyEffect();
 
 private:
 	TObjectPtr<USkeletalMeshComponent> SkeletalMesh;
+	TObjectPtr<UComboAnimInstance> AnimInstance;
 	TObjectPtr<AComboProjectCharacter> ComboCharacter;
 	TSharedPtr<FComboNode> CurrentComboNode;
 	
