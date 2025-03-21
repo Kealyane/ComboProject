@@ -54,6 +54,11 @@ public:
 	UFUNCTION()
 	bool HasStamina(float Value);
 
+	UFUNCTION()
+	float GetCurrentHP() const { return CurrentHP; }
+	UFUNCTION()
+	float GetMaxHP() const { return MaxHP; }
+
 private:
 	FTimerHandle StaminaTimerHandle;
 };

@@ -20,15 +20,23 @@ void UCharacterStatsComponent::BeginPlay()
 
 void UCharacterStatsComponent::InitStats()
 {
-	MaxHP = CharacterStatsAsset->Health;
-	CurrentHP = MaxHP;
+	if (CharacterStatsAsset)
+	{
+		MaxHP = CharacterStatsAsset->Health;
+		CurrentHP = MaxHP;
 
-	MaxStamina = CharacterStatsAsset->Stamina;
-	CurrentStamina = MaxStamina;
-	StaminaRegenRate = CharacterStatsAsset->StaminaRegenRate;
-	
-	BaseAttack = CharacterStatsAsset->BaseAttack;
-	CurrentAttack = BaseAttack;
+		MaxStamina = CharacterStatsAsset->Stamina;
+		CurrentStamina = MaxStamina;
+		StaminaRegenRate = CharacterStatsAsset->StaminaRegenRate;
+		StaminaDelayBeforeRegen = CharacterStatsAsset->StaminaDelayBeforeRegen;
+		
+		BaseAttack = CharacterStatsAsset->BaseAttack;
+		CurrentAttack = BaseAttack;
+	}
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("CharacterStatsAsset is NULL"));
+	}
 }
 
 void UCharacterStatsComponent::ChangeHP(float Value)
@@ -67,6 +75,8 @@ void UCharacterStatsComponent::RegenerateStamina()
 
 bool UCharacterStatsComponent::HasStamina(float Value)
 {
+	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Cyan,
+		FString::Printf(TEXT("has stamina : %f"), CurrentStamina - Value));
 	return CurrentStamina - Value >= 0.f;
 }
 
