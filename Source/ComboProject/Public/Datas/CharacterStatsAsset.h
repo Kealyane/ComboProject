@@ -20,7 +20,10 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Stats)
 	float Stamina = 50.f;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Stats)
-	float StaminaRegenRate = 2.f;
+	float StaminaRegenRate = 0.5f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Stats)
+	float StaminaDelayBeforeRegen = 2.f;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Stats)
 	float BaseAttack = 5.f;
+	
 };
