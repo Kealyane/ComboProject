@@ -14,10 +14,12 @@ class USpringArmComponent;
 class UCameraComponent;
 class UInputMappingContext;
 class UInputAction;
+class AEnemyCharacter;
 struct FInputActionValue;
 
 DECLARE_LOG_CATEGORY_EXTERN(LogTemplateCharacter, Log, All);
 DECLARE_DYNAMIC_DELEGATE_OneParam(FInputFiredSignature, EInputType, InputName);
+DECLARE_DYNAMIC_DELEGATE_TwoParams(FSwordHitSignature, bool, bIsHitting, AEnemyCharacter*, EnemyHit);
 
 UCLASS(config=Game)
 class AComboProjectCharacter : public ACharacter
@@ -64,9 +66,12 @@ public:
 	AComboProjectCharacter();
 	
 	FInputFiredSignature InputFired;
+	FSwordHitSignature SwordHit;
 
 	UFUNCTION(BlueprintCallable)
 	UCharacterStatsComponent* GetStatsComponent() const {return StatsComponent;}
+	UFUNCTION(BlueprintCallable)
+	void SetSwordCapsule(UCapsuleComponent* InSwordCapsule) { SwordCapsule = InSwordCapsule; }
 	
 protected:
 
@@ -80,11 +85,18 @@ protected:
 
 	void AttackLight(const FInputActionValue& Value);
 	void AttackHeavy(const FInputActionValue& Value);
-			
-
-protected:
+	
 	// APawn interface
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+
+	UFUNCTION()
+	void OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, 
+						UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, 
+						bool bFromSweep, const FHitResult& SweepResult);
+
+	UFUNCTION()
+	void OnOverlapEnd(UPrimitiveComponent* OverlappedComp, AActor* OtherActor,
+					  UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 	
 	// To add mapping context
 	virtual void BeginPlay();
@@ -94,5 +106,10 @@ public:
 	FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
 	/** Returns FollowCamera subobject **/
 	FORCEINLINE class UCameraComponent* GetFollowCamera() const { return FollowCamera; }
+
+private:
+	TObjectPtr<UCapsuleComponent> SwordCapsule;
 };
+
+
 

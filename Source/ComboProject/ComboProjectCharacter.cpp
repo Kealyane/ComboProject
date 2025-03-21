@@ -12,6 +12,7 @@
 #include "InputActionValue.h"
 #include "Character/CharacterStatsComponent.h"
 #include "Character/ComboComponent.h"
+#include "Character/EnemyCharacter.h"
 
 DEFINE_LOG_CATEGORY(LogTemplateCharacter);
 
@@ -63,6 +64,8 @@ void AComboProjectCharacter::BeginPlay()
 {
 	// Call the base class  
 	Super::BeginPlay();
+
+	SwordCapsule->OnComponentBeginOverlap.AddDynamic(this, &AComboProjectCharacter::OnOverlapBegin);
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -164,5 +167,26 @@ void AComboProjectCharacter::AttackHeavy(const FInputActionValue& Value)
 	{
 		InputFired.ExecuteIfBound(EInputType::MouseRight);
 		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Heavy Attack"));
+	}
+}
+
+void AComboProjectCharacter::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor,
+	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+	if (OtherActor != nullptr)
+	{
+		if (AEnemyCharacter* Enemy = Cast<AEnemyCharacter>(OtherActor))
+		{
+			SwordHit.ExecuteIfBound(true, Enemy);
+		}
+	}
+}
+
+void AComboProjectCharacter::OnOverlapEnd(UPrimitiveComponent* OverlappedComp, AActor* OtherActor,
+	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
+{
+	if (OtherActor != nullptr && OtherActor->IsA(AEnemyCharacter::StaticClass()))
+	{
+		SwordHit.ExecuteIfBound(false, nullptr);
 	}
 }
