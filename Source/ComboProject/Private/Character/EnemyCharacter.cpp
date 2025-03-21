@@ -22,8 +22,6 @@ AEnemyCharacter::AEnemyCharacter()
 void AEnemyCharacter::BeginPlay()
 {
 	Super::BeginPlay();
-	EnemyWidget = Cast<UEnemyWidget>(WidgetComponent->GetWidget());
-	check(EnemyWidget);
 	check(StatsComponent);
 }
 
@@ -31,6 +29,11 @@ void AEnemyCharacter::UpdateHealth(float AttackValue)
 {
 	StatsComponent->ChangeHP(-AttackValue);
 	EnemyWidget->SetHealthBar(StatsComponent->GetCurrentHP()/StatsComponent->GetMaxHP());
+void AEnemyCharacter::SetWidgetComponent(UWidgetComponent* InWidgetComponent)
+{
+	WidgetComponent = InWidgetComponent; 
+	EnemyWidget = Cast<UEnemyWidget>(WidgetComponent->GetWidget());
+	check(EnemyWidget);
 }
 
 

@@ -38,7 +38,7 @@ public:
 	void UpdateHealth(float AttackValue);
 
 	UFUNCTION(BlueprintCallable)
-	void SetWidgetComponent(UWidgetComponent* InWidgetComponent) { WidgetComponent = InWidgetComponent; }
+	void SetWidgetComponent(UWidgetComponent* InWidgetComponent);
 	
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
