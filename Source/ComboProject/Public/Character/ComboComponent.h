@@ -7,6 +7,7 @@
 #include "Datas/MyEnums.h"
 #include "ComboComponent.generated.h"
 
+class AEnemyCharacter;
 class UComboAnimInstance;
 class AComboProjectCharacter;
 class UComboNodeAsset;
@@ -64,6 +65,7 @@ protected:
 	bool bIsComboActive;
 	bool bInputWindowOpen;
 	bool bHasReceivedInput;
+	bool bIsEnemyInRange;
 
 	void StartCombo(EInputType InputName);
 	void NextCombo(EInputType InputName);
@@ -75,12 +77,17 @@ protected:
 	void OnInputWindowOpen(bool bIsOpen);
 	UFUNCTION()
 	void OnApplyEffect();
+	UFUNCTION()
+	void OnAnimHit();
+	UFUNCTION()
+	void OnSwordHit(bool bIsHitting, AEnemyCharacter* EnemyCharacter);
 
 private:
 	TObjectPtr<USkeletalMeshComponent> SkeletalMesh;
 	TObjectPtr<UComboAnimInstance> AnimInstance;
 	TObjectPtr<AComboProjectCharacter> ComboCharacter;
 	TSharedPtr<FComboNode> CurrentComboNode;
+	TObjectPtr<AEnemyCharacter> EnemyHit;
 	
 	void InitComboNodes(const TSharedPtr<FComboNode> *CurrentNode, const UComboNodeAsset* CurrentComboAsset);
 	void DebugGraph(const TSharedPtr<FComboNode>& Node, const FString& Indent);

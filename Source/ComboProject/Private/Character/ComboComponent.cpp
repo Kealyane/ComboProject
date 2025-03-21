@@ -5,6 +5,7 @@
 
 #include "Animation/ComboAnimInstance.h"
 #include "Character/CharacterStatsComponent.h"
+#include "Character/EnemyCharacter.h"
 #include "ComboProject/ComboProjectCharacter.h"
 #include "Datas/ComboNodeAsset.h"
 
@@ -32,10 +33,12 @@ void UComboComponent::BeginPlay()
 
 	AnimInstance->AnimInputWindow.AddDynamic(this, &UComboComponent::OnInputWindowOpen);
 	AnimInstance->AnimApplyEffect.AddDynamic(this, &UComboComponent::OnApplyEffect);
+	AnimInstance->AnimHit.AddDynamic(this, &UComboComponent::OnAnimHit);
 	
 	InitGraph();
 
 	ComboCharacter->InputFired.BindUFunction(this, FName("OnInputReceived"));
+	ComboCharacter->SwordHit.BindUFunction(this, FName("OnSwordHit"));
 
 	// Debug
 	DebugGraph(ComboGraph, TEXT(""));
@@ -50,7 +53,11 @@ void UComboComponent::StartCombo(EInputType InputName)
 	if ((*ComboGraph).Nodes.Contains(InputName))
 	{
 		CurrentComboNode = (*ComboGraph).Nodes[InputName];
-		AnimInstance->Montage_Play(CurrentComboNode->AnimationMontage);
+		if (ComboCharacter->GetStatsComponent()->HasStamina(CurrentComboNode->StaminaCost))
+		{
+			AnimInstance->Montage_Play(CurrentComboNode->AnimationMontage);
+		}
+		else EndCombo();
 	}
 }
 
@@ -59,7 +66,7 @@ void UComboComponent::NextCombo(EInputType InputName)
 	if (bInputWindowOpen &&
 		(*CurrentComboNode).Nodes.Contains(InputName))
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Cyan, TEXT("Next combo: update current"));
+		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, TEXT("Next combo: update current"));
 		CurrentComboNode = (*CurrentComboNode).Nodes[InputName];
 		
 		if (ComboCharacter->GetStatsComponent()->HasStamina(CurrentComboNode->StaminaCost))
@@ -132,6 +139,25 @@ void UComboComponent::OnApplyEffect()
 	{
 		ComboCharacter->GetStatsComponent()->ChangeStamina(-CurrentComboNode->StaminaCost);
 	}
+}
+
+void UComboComponent::OnAnimHit()
+{
+	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, TEXT("OnAnimHit"));
+	if (bIsEnemyInRange && EnemyHit)
+	{
+		EnemyHit->UpdateHealth(CurrentComboNode->Damage);
+	}
+}
+
+void UComboComponent::OnSwordHit(bool bIsHitting, AEnemyCharacter* EnemyCharacter)
+{
+	if (bIsHitting)
+		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, TEXT("OnSwordHit Start"));
+	else
+		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, TEXT("OnSwordHit End"));
+	bIsEnemyInRange = bIsHitting;
+	EnemyHit = EnemyCharacter;
 }
 
 void UComboComponent::InitGraph()
