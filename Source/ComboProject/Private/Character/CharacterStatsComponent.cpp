@@ -75,17 +75,5 @@ void UCharacterStatsComponent::RegenerateStamina()
 
 bool UCharacterStatsComponent::HasStamina(float Value)
 {
-	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Cyan,
-		FString::Printf(TEXT("has stamina : %f"), CurrentStamina - Value));
 	return CurrentStamina - Value >= 0.f;
 }
-
-
-// // Called every frame
-// void UCharacterStatsComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
-// {
-// 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-//
-// 	// ...
-// }
-

@@ -41,16 +41,15 @@ protected:
 
 	UFUNCTION()
 	void InitStats();
+	UFUNCTION()
+	void RegenerateStamina();
 
 public:	
-	//virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 	UFUNCTION()
 	void ChangeHP(float Value);
 	UFUNCTION()
 	void ChangeStamina(float Value);
-	UFUNCTION()
-	void RegenerateStamina();
 	UFUNCTION()
 	bool HasStamina(float Value);
 
@@ -58,6 +57,8 @@ public:
 	float GetCurrentHP() const { return CurrentHP; }
 	UFUNCTION()
 	float GetMaxHP() const { return MaxHP; }
+	UFUNCTION()
+	float GetBaseAttack() const { return BaseAttack; }
 
 private:
 	FTimerHandle StaminaTimerHandle;

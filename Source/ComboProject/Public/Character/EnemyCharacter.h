@@ -17,7 +17,6 @@ class COMBOPROJECT_API AEnemyCharacter : public ACharacter
 	GENERATED_BODY()
 
 public:
-	// Sets default values for this character's properties
 	AEnemyCharacter();
 
 	UFUNCTION(BlueprintCallable)
@@ -26,28 +25,22 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	bool bIsHit;
 	
-protected:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
-	TObjectPtr<UCharacterStatsComponent> StatsComponent;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
-	TObjectPtr<UWidgetComponent> WidgetComponent;
-	
-	// Called when the game starts or when spawned
-	virtual void BeginPlay() override;
-
-	UFUNCTION()
-	void ResetHit() { bIsHit = false; }
-
-public:	
-
 	UFUNCTION()
 	void UpdateHealth(float AttackValue);
 
 	UFUNCTION(BlueprintCallable)
 	void SetWidgetComponent(UWidgetComponent* InWidgetComponent);
 	
-	// Called to bind functionality to input
-	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+protected:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<UCharacterStatsComponent> StatsComponent;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<UWidgetComponent> WidgetComponent;
+	
+	virtual void BeginPlay() override;
+
+	UFUNCTION()
+	void ResetHit() { bIsHit = false; }
 
 private:
 	TObjectPtr<UEnemyWidget> EnemyWidget;

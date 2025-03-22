@@ -84,10 +84,6 @@ void AComboProjectCharacter::SetupPlayerInputComponent(UInputComponent* PlayerIn
 	
 	// Set up action bindings
 	if (UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(PlayerInputComponent)) {
-		
-		// // Jumping
-		// EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Started, this, &ACharacter::Jump);
-		// EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Completed, this, &ACharacter::StopJumping);
 
 		// Moving
 		EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &AComboProjectCharacter::Move);
@@ -129,10 +125,6 @@ void AComboProjectCharacter::Move(const FInputActionValue& Value)
 			AddMovementInput(RightDirection, MovementVector.X);
 		}
 	}
-	// else
-	// {
-	// 	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Cyan, TEXT("character : can't move"));
-	// }
 }
 
 void AComboProjectCharacter::Look(const FInputActionValue& Value)
@@ -155,7 +147,6 @@ void AComboProjectCharacter::AttackLight(const FInputActionValue& Value)
 	if (InputValue && (!ComboComponent->IsComboActive() || ComboComponent->IsInputWindowOpen()))
 	{
 		InputFired.ExecuteIfBound(EInputType::MouseLeft);
-		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Light Attack"));
 	}
 }
 
@@ -166,7 +157,6 @@ void AComboProjectCharacter::AttackHeavy(const FInputActionValue& Value)
 	if (InputValue && (!ComboComponent->IsComboActive() || ComboComponent->IsInputWindowOpen()))
 	{
 		InputFired.ExecuteIfBound(EInputType::MouseRight);
-		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Heavy Attack"));
 	}
 }
 

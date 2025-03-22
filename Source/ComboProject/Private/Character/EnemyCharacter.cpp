@@ -37,18 +37,11 @@ void AEnemyCharacter::UpdateHealth(float AttackValue)
 	GetWorldTimerManager().SetTimer(ResetHitHandle, this, &AEnemyCharacter::ResetHit, 1.f, false);
 }
 
+// Get widget component from BP since by using code the widget is not visible 
 void AEnemyCharacter::SetWidgetComponent(UWidgetComponent* InWidgetComponent)
 {
 	WidgetComponent = InWidgetComponent; 
 	EnemyWidget = Cast<UEnemyWidget>(WidgetComponent->GetWidget());
 	check(EnemyWidget);
-}
-
-
-// Called to bind functionality to input
-void AEnemyCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
-{
-	Super::SetupPlayerInputComponent(PlayerInputComponent);
-
 }
 

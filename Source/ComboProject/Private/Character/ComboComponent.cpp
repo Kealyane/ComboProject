@@ -25,7 +25,7 @@ void UComboComponent::BeginPlay()
 	ComboCharacter = Cast<AComboProjectCharacter>(GetOwner());
 	check(ComboCharacter);
 	
-	SkeletalMesh = ComboCharacter->GetMesh();
+	USkeletalMeshComponent* SkeletalMesh = ComboCharacter->GetMesh();
 	check(SkeletalMesh);
 	
 	AnimInstance = Cast<UComboAnimInstance>(SkeletalMesh->GetAnimInstance());
@@ -67,7 +67,6 @@ void UComboComponent::NextCombo(EInputType InputName)
 	{
 		if ((*CurrentComboNode).Nodes.Contains(InputName))
 		{
-			//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, TEXT("Next combo: update current"));
 			CurrentComboNode = (*CurrentComboNode).Nodes[InputName];
 		
 			if (ComboCharacter->GetStatsComponent()->HasStamina(CurrentComboNode->StaminaCost))
@@ -77,14 +76,12 @@ void UComboComponent::NextCombo(EInputType InputName)
 		}
 		else if (CurrentComboNode->IsLastCombo())
 		{
-			//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, TEXT("Next combo: Last combo start new combo"));
 			EndCombo();
 			StartCombo(InputName);
 		}
 	}
 	else
 	{
-		//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Cyan, TEXT("Next combo : wrong input"));
 		bIsComboActive = false;
 		CurrentComboNode = nullptr;
 		bHasReceivedInput = false;
@@ -93,7 +90,6 @@ void UComboComponent::NextCombo(EInputType InputName)
 
 void UComboComponent::EndCombo()
 {
-	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Cyan, TEXT("End Combo"));
 	bIsComboActive = false;
 	bInputWindowOpen = false;
 	bHasReceivedInput = false;
@@ -101,20 +97,12 @@ void UComboComponent::EndCombo()
 
 void UComboComponent::OnInputReceived(EInputType InputReceived)
 {
-	// GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Cyan,
-	// 	*FString::Printf(TEXT("Input Received %s"), *EnumDebugHelper::InputToString(InputReceived)));
 	if (!bIsComboActive)
 	{
-		//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Cyan, TEXT("Input Received: combo not active"));
-		//if (!AnimInstance->Montage_IsPlaying(nullptr))
-		//{
-			//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Cyan, TEXT("Input Received  : start combo"));
-			StartCombo(InputReceived);
-		//}
+		StartCombo(InputReceived);
 	}
 	else
 	{
-		//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Cyan, TEXT("Input Received: combo active"));
 		NextCombo(InputReceived);
 	}
 }
@@ -135,7 +123,6 @@ void UComboComponent::OnInputWindowOpen(bool bIsOpen)
 		}
 		else
 		{
-			//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Cyan, TEXT("OnInputWindowOpen : close play next anim"));
 			AnimInstance->Montage_Play(CurrentComboNode->AnimationMontage);
 			bHasReceivedInput = false;
 		}
@@ -152,7 +139,6 @@ void UComboComponent::OnApplyEffect()
 
 void UComboComponent::OnAnimHit()
 {
-	//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, TEXT("OnAnimHit"));
 	if (bIsEnemyInRange && EnemyHit && CurrentComboNode)
 	{
 		EnemyHit->UpdateHealth(CurrentComboNode->Damage);
@@ -161,10 +147,6 @@ void UComboComponent::OnAnimHit()
 
 void UComboComponent::OnSwordHit(bool bIsHitting, AEnemyCharacter* EnemyCharacter)
 {
-	// if (bIsHitting)
-	// 	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, TEXT("OnSwordHit Start"));
-	// else
-	// 	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, TEXT("OnSwordHit End"));
 	bIsEnemyInRange = bIsHitting;
 	EnemyHit = EnemyCharacter;
 }

@@ -46,9 +46,8 @@ class COMBOPROJECT_API UComboComponent : public UActorComponent
 public:	
 	UComboComponent();
 
-	bool IsComboActive() const { return bIsComboActive; }
-	bool IsInputWindowOpen() const { return bInputWindowOpen; }
-	bool HasReceivedInput() const { return bHasReceivedInput; }
+	FORCEINLINE bool IsComboActive() const { return bIsComboActive; }
+	FORCEINLINE bool IsInputWindowOpen() const { return bInputWindowOpen; }
 
 protected:
 
@@ -56,34 +55,35 @@ protected:
 	//TObjectPtr<UComboNodeAsset> ComboEntryAsset;
 	UComboNodeAsset* ComboEntryAsset;
 	
-	virtual void BeginPlay() override;
-
 	TSharedPtr<FComboNode> ComboGraph;
-	UFUNCTION()
-	void InitGraph();
-
+	
 	bool bIsComboActive;
 	bool bInputWindowOpen;
 	bool bHasReceivedInput;
 	bool bIsEnemyInRange;
 
+	virtual void BeginPlay() override;
+	
+	void InitGraph();
 	void StartCombo(EInputType InputName);
 	void NextCombo(EInputType InputName);
 	void EndCombo();
 
+	/* Bind to Charecter delegates */
 	UFUNCTION()
 	void OnInputReceived(EInputType InputReceived);
+	UFUNCTION()
+	void OnSwordHit(bool bIsHitting, AEnemyCharacter* EnemyCharacter);
+	
+	/* Bind to AnimInstance delegates */
 	UFUNCTION()
 	void OnInputWindowOpen(bool bIsOpen);
 	UFUNCTION()
 	void OnApplyEffect();
 	UFUNCTION()
 	void OnAnimHit();
-	UFUNCTION()
-	void OnSwordHit(bool bIsHitting, AEnemyCharacter* EnemyCharacter);
 
 private:
-	TObjectPtr<USkeletalMeshComponent> SkeletalMesh;
 	TObjectPtr<UComboAnimInstance> AnimInstance;
 	TObjectPtr<AComboProjectCharacter> ComboCharacter;
 	TSharedPtr<FComboNode> CurrentComboNode;
