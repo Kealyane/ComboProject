@@ -11,8 +11,6 @@ void UAnimNotifyState_InputWindow::NotifyBegin(USkeletalMeshComponent* MeshComp,
 {
 	Super::NotifyBegin(MeshComp, Animation, TotalDuration, EventReference);
 
-	//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Notify begin : input window"));
-
 	UComboAnimInstance* AnimInstance = Cast<UComboAnimInstance>(MeshComp->GetAnimInstance());
 	if (AnimInstance)
 	{
@@ -24,8 +22,6 @@ void UAnimNotifyState_InputWindow::NotifyEnd(USkeletalMeshComponent* MeshComp, U
 	const FAnimNotifyEventReference& EventReference)
 {
 	Super::NotifyEnd(MeshComp, Animation, EventReference);
-
-	//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Notify end : input window"));
 
 	UComboAnimInstance* AnimInstance = Cast<UComboAnimInstance>(MeshComp->GetAnimInstance());
 	if (AnimInstance)

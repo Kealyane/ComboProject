@@ -10,8 +10,6 @@ void UAnimNotify_Hit::Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceBase
 {
 	Super::Notify(MeshComp, Animation, EventReference);
 
-	//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Notify : Hit"));
-
 	UComboAnimInstance* AnimInstance = Cast<UComboAnimInstance>(MeshComp->GetAnimInstance());
 	if (AnimInstance)
 	{
