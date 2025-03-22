@@ -66,6 +66,7 @@ void AComboProjectCharacter::BeginPlay()
 	Super::BeginPlay();
 
 	SwordCapsule->OnComponentBeginOverlap.AddDynamic(this, &AComboProjectCharacter::OnOverlapBegin);
+	SwordCapsule->OnComponentEndOverlap.AddDynamic(this, &AComboProjectCharacter::OnOverlapEnd);
 }
 
 //////////////////////////////////////////////////////////////////////////
