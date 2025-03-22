@@ -153,7 +153,7 @@ void UComboComponent::OnApplyEffect()
 void UComboComponent::OnAnimHit()
 {
 	//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, TEXT("OnAnimHit"));
-	if (bIsEnemyInRange && EnemyHit)
+	if (bIsEnemyInRange && EnemyHit && CurrentComboNode)
 	{
 		EnemyHit->UpdateHealth(CurrentComboNode->Damage);
 	}

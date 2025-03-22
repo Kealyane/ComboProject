@@ -12,7 +12,8 @@ AEnemyCharacter::AEnemyCharacter()
 {
 	PrimaryActorTick.bCanEverTick = false;
 	StatsComponent = CreateDefaultSubobject<UCharacterStatsComponent>(TEXT("StatsComponent"));
-	
+
+	// DO NOT WORK, WIDGET NOT VISIBLE
 	// WidgetComponent = CreateDefaultSubobject<UWidgetComponent>(TEXT("WidgetComponent"));
 	// WidgetComponent->SetupAttachment(RootComponent);
 	// WidgetComponent->SetVisibility(true);
@@ -22,6 +23,7 @@ AEnemyCharacter::AEnemyCharacter()
 void AEnemyCharacter::BeginPlay()
 {
 	Super::BeginPlay();
+	bIsHit = false;
 	check(StatsComponent);
 }
 
@@ -29,6 +31,12 @@ void AEnemyCharacter::UpdateHealth(float AttackValue)
 {
 	StatsComponent->ChangeHP(-AttackValue);
 	EnemyWidget->SetHealthBar(StatsComponent->GetCurrentHP()/StatsComponent->GetMaxHP());
+	bIsHit = true;
+
+	FTimerHandle ResetHitHandle;
+	GetWorldTimerManager().SetTimer(ResetHitHandle, this, &AEnemyCharacter::ResetHit, 1.f, false);
+}
+
 void AEnemyCharacter::SetWidgetComponent(UWidgetComponent* InWidgetComponent)
 {
 	WidgetComponent = InWidgetComponent; 

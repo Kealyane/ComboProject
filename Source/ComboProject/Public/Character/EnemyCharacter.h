@@ -22,6 +22,9 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	UCharacterStatsComponent* GetCharacterStatsComponent() const { return StatsComponent; }
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	bool bIsHit;
 	
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
@@ -31,6 +34,9 @@ protected:
 	
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+
+	UFUNCTION()
+	void ResetHit() { bIsHit = false; }
 
 public:	
 
