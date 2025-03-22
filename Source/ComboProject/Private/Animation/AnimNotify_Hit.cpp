@@ -16,3 +16,15 @@ void UAnimNotify_Hit::Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceBase
 		AnimInstance->AnimHit.Broadcast();
 	}
 }
+
+void UAnimNotify_EndAnimation::Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation,
+							 const FAnimNotifyEventReference& EventReference)
+{
+	Super::Notify(MeshComp, Animation, EventReference);
+
+	UComboAnimInstance* AnimInstance = Cast<UComboAnimInstance>(MeshComp->GetAnimInstance());
+	if (AnimInstance)
+	{
+		AnimInstance->AnimEnd.Broadcast();
+	}
+}

@@ -17,3 +17,12 @@ class COMBOPROJECT_API UAnimNotify_Hit : public UAnimNotify
 public:
 	virtual void Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation, const FAnimNotifyEventReference& EventReference) override;
 };
+
+UCLASS()
+class COMBOPROJECT_API UAnimNotify_EndAnimation : public UAnimNotify
+{
+	GENERATED_BODY()
+
+public:
+	virtual void Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation, const FAnimNotifyEventReference& EventReference) override;
+};

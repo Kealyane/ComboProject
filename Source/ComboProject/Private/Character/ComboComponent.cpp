@@ -9,6 +9,7 @@
 #include "ComboProject/ComboProjectCharacter.h"
 #include "Datas/ComboNodeAsset.h"
 
+
 UComboComponent::UComboComponent()
 {
 	PrimaryComponentTick.bCanEverTick = false;
@@ -34,6 +35,7 @@ void UComboComponent::BeginPlay()
 	AnimInstance->AnimInputWindow.AddDynamic(this, &UComboComponent::OnInputWindowOpen);
 	AnimInstance->AnimApplyEffect.AddDynamic(this, &UComboComponent::OnApplyEffect);
 	AnimInstance->AnimHit.AddDynamic(this, &UComboComponent::OnAnimHit);
+	AnimInstance->AnimEnd.AddDynamic(this, &UComboComponent::OnAnimEnd);
 	
 	InitGraph();
 
@@ -57,7 +59,11 @@ void UComboComponent::StartCombo(EInputType InputName)
 		{
 			AnimInstance->Montage_Play(CurrentComboNode->AnimationMontage);
 		}
-		else EndCombo();
+		else
+		{
+			bIsComboActive = false;
+			EndCombo();
+		}
 	}
 }
 
@@ -90,9 +96,9 @@ void UComboComponent::NextCombo(EInputType InputName)
 
 void UComboComponent::EndCombo()
 {
-	bIsComboActive = false;
 	bInputWindowOpen = false;
 	bHasReceivedInput = false;
+	bIsEndCombo = true;
 }
 
 void UComboComponent::OnInputReceived(EInputType InputReceived)
@@ -141,7 +147,17 @@ void UComboComponent::OnAnimHit()
 {
 	if (bIsEnemyInRange && EnemyHit && CurrentComboNode)
 	{
-		EnemyHit->UpdateHealth(CurrentComboNode->Damage);
+		float TotalDamage = ComboCharacter->GetStatsComponent()->GetBaseAttack() + CurrentComboNode->Damage;
+		EnemyHit->UpdateHealth(TotalDamage);
+	}
+}
+
+void UComboComponent::OnAnimEnd()
+{
+	if (bIsEndCombo)
+	{
+		bIsComboActive = false;
+		bIsEndCombo = false;
 	}
 }
 
@@ -210,4 +226,5 @@ void UComboComponent::DebugGraph(const TSharedPtr<FComboNode>& Node, const FStri
 		DebugGraph(Entry.Value, Indent + TEXT("    "));
 	}
 }
+
 

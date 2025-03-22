@@ -61,6 +61,7 @@ protected:
 	bool bInputWindowOpen;
 	bool bHasReceivedInput;
 	bool bIsEnemyInRange;
+	bool bIsEndCombo;
 
 	virtual void BeginPlay() override;
 	
@@ -82,6 +83,8 @@ protected:
 	void OnApplyEffect();
 	UFUNCTION()
 	void OnAnimHit();
+	UFUNCTION()
+	void OnAnimEnd();
 
 private:
 	TObjectPtr<UComboAnimInstance> AnimInstance;

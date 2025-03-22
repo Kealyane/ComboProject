@@ -8,6 +8,7 @@
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FAnimApplyEffectSignature);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FAnimHitSignature);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FAnimEndSignature);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FAnimInputWindow, bool, bIsOpen);
 
 /**
@@ -25,4 +26,6 @@ public:
 	FAnimHitSignature AnimHit;
 	UPROPERTY(BlueprintAssignable)
 	FAnimInputWindow AnimInputWindow;
+	UPROPERTY(BlueprintAssignable)
+	FAnimEndSignature AnimEnd;
 };
